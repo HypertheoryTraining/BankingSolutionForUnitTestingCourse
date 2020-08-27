@@ -4,9 +4,21 @@ namespace BankingDomain
 {
     public class CutoffBonusCalculator : ICalculateBankAccountBonuses
     {
+        IProvideTheCutoffClock _cutoff;
+
+        public CutoffBonusCalculator(IProvideTheCutoffClock cutoff)
+        {
+            _cutoff = cutoff;
+        }
+
+        //public CutoffBonusCalculator()
+        //{
+        //    _cutoff = new StandardCutoffClock();
+        //}
+
         decimal ICalculateBankAccountBonuses.GetDepositBonusFor(decimal balance, decimal amountToDeposit)
         {
-            if (BeforeCutoff())
+            if (_cutoff.IsBeforeCutoff())
             {
                 return amountToDeposit * .10M;
             }
@@ -16,10 +28,6 @@ namespace BankingDomain
             }
         }
 
-        // "Introduced a Seam"
-        protected virtual bool BeforeCutoff()
-        {
-            return DateTime.Now.Hour <= 17;
-        }
+        
     }
 }

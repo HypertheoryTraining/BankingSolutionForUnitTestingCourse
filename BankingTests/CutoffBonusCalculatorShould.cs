@@ -1,4 +1,5 @@
 ﻿using BankingDomain;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +12,9 @@ namespace BankingTests
         [Fact]
         public void GiveYouTheBonusBeforeDailyCutoff()
         {
-            ICalculateBankAccountBonuses calculator = new TestingBonusCalculator(true);
+            var cutoffStub = new Mock<IProvideTheCutoffClock>();
+            cutoffStub.Setup(c => c.IsBeforeCutoff()).Returns(true);
+            ICalculateBankAccountBonuses calculator = new CutoffBonusCalculator(cutoffStub.Object);
 
             var bonus = calculator.GetDepositBonusFor(1000, 100);
 
@@ -21,7 +24,9 @@ namespace BankingTests
         [Fact]
         public void GiveNoBonusAfterDailyCutoff()
         {
-            ICalculateBankAccountBonuses calculator = new TestingBonusCalculator(false);
+            var cutoffStub = new Mock<IProvideTheCutoffClock>();
+            cutoffStub.Setup(c => c.IsBeforeCutoff()).Returns(false);
+            ICalculateBankAccountBonuses calculator = new CutoffBonusCalculator(cutoffStub.Object);
 
             var bonus = calculator.GetDepositBonusFor(1000, 100);
 
@@ -29,18 +34,18 @@ namespace BankingTests
         }
     }
 
-    public class TestingBonusCalculator : CutoffBonusCalculator
-    {
-        bool beforeCutoffResponse;
+    //public class TestingBonusCalculator : CutoffBonusCalculator
+    //{
+    //    bool beforeCutoffResponse;
 
-        public TestingBonusCalculator(bool beforeCutoffResponse)
-        {
-            this.beforeCutoffResponse = beforeCutoffResponse;
-        }
+    //    public TestingBonusCalculator(bool beforeCutoffResponse)
+    //    {
+    //        this.beforeCutoffResponse = beforeCutoffResponse;
+    //    }
 
-        protected override bool BeforeCutoff()
-        {
-            return beforeCutoffResponse;
-        }
-    }
+    //    protected override bool BeforeCutoff()
+    //    {
+    //        return beforeCutoffResponse;
+    //    }
+    //}
 }
