@@ -16,6 +16,7 @@ namespace BankingDomain
             }
         }
 
+        // "Introduced a Seam"
         protected virtual bool BeforeCutoff()
         {
             return DateTime.Now.Hour <= 17;
